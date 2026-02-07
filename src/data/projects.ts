@@ -23,10 +23,10 @@ export const projects = [
       zh: 'DMA 学习资料',
     },
     description: {
-      en: 'Digital Marketing Analytics learning materials including DMA I and DMA II course resources. Hosted on GitHub.',
-      zh: '数字营销分析学习资料，包括 DMA I 和 DMA II 课程资源。托管于GitHub。',
+      en: 'Digital Management Accounting learning materials including DMA I and DMA II course resources. Hosted on GitHub.',
+      zh: '数字管理会计学习资料，包括 DMA I 和 DMA II 课程资源。托管于GitHub。',
     },
-    tags: ['DMA', 'Marketing', 'Study Resources'],
+    tags: ['DMA', 'Management Accounting', 'Study Resources'],
     coverImage: '/images/projects/dma-study-resources-cover.png',
     image: '/images/projects/dma-study-resources-cover.png',
     demo: '/dma-resources',

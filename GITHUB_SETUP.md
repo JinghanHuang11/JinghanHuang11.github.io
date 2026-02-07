@@ -32,7 +32,7 @@ dma-resources/
 1. **创建新仓库**
    - 访问：https://github.com/new
    - Repository name: `dma-resources`
-   - Description: `Digital Marketing Analytics learning materials including DMA I and DMA II course resources`
+   - Description: `Digital Management Accounting learning materials including DMA I and DMA II course resources`
    - 选择 **Public**（公开）
    - **不要**勾选 "Add a README file"
    - 点击 "Create repository"

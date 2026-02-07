@@ -1,0 +1,115 @@
+---
+import { siteConfig } from '@/data/site';
+import { ui, type Locale } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale];
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-dark-900">
+  <div class="container-custom section-padding">
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- Brand -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold">{siteConfig.name[locale]}</h3>
+        <p class="text-body text-sm">
+          {siteConfig.description[locale]}
+        </p>
+      </div>
+
+      <!-- Navigation -->
+      <div>
+        <h4 class="mb-4 font-semibold">{t.nav.home}</h4>
+        <ul class="space-y-2">
+          {siteConfig.nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="text-sm text-slate-600 transition-colors hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400"
+              >
+                {item.label[locale]}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Social -->
+      <div>
+        <h4 class="mb-4 font-semibold">Connect</h4>
+        <ul class="space-y-2">
+          <li>
+            <a
+              href={siteConfig.social[0].href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-slate-600 transition-colors hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400"
+            >
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a
+              href={`mailto:${siteConfig.author.email}`}
+              class="text-sm text-slate-600 transition-colors hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400"
+            >
+              Email
+            </a>
+          </li>
+          <li>
+            <a
+              href={siteConfig.social[2].href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-slate-600 transition-colors hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400"
+            >
+              {locale === 'en' ? 'Xiaohongshu' : '小红书'}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Language -->
+      <div>
+        <h4 class="mb-4 font-semibold">Language</h4>
+        <div class="flex space-x-4">
+          <a
+            href={Astro.url.pathname + '?lang=en'}
+            class={`text-sm transition-colors ${
+              locale === 'en'
+                ? 'font-medium text-primary-600 dark:text-primary-400'
+                : 'text-slate-600 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400'
+            }`}
+          >
+            English
+          </a>
+          <a
+            href={Astro.url.pathname + '?lang=zh'}
+            class={`text-sm transition-colors ${
+              locale === 'zh'
+                ? 'font-medium text-primary-600 dark:text-primary-400'
+                : 'text-slate-600 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400'
+            }`}
+          >
+            中文
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="mt-8 border-t border-slate-200 pt-8 dark:border-slate-800">
+      <p class="text-center text-sm text-slate-600 dark:text-slate-400">
+        {t.footer.copyright.replace('{year}', String(currentYear))}
+      </p>
+      <p class="mt-2 text-center text-xs text-slate-500 dark:text-slate-500">
+        {t.footer.madeWith}
+      </p>
+    </div>
+  </div>
+</footer>

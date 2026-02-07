@@ -1,0 +1,165 @@
+---
+import { getCollection } from 'astro:content';
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import { ui, type Locale } from '@/i18n/ui';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { title, description, publishedAt, tags } = post.data;
+
+// Get locale from post data
+const locale: Locale = post.data.locale || 'en';
+const t = ui[locale];
+
+const formattedDate = new Date(publishedAt).toLocaleDateString(
+  locale === 'zh' ? 'zh-CN' : 'en-US',
+  { year: 'numeric', month: 'long', day: 'numeric' }
+);
+
+const { Content } = await post.render();
+
+// Get related posts
+const allPosts = await getCollection('blog');
+const relatedPosts = allPosts
+  .filter(p => p.slug !== post.slug && !p.data.draft)
+  .filter(p => p.data.tags.some(tag => tags.includes(tag)))
+  .slice(0, 3);
+---
+
+<BlogLayout title={title} description={description} locale={locale}>
+  <!-- Post Header -->
+  <header class="mb-12">
+    <div class="mb-6 flex flex-wrap gap-2">
+      {tags.map((tag) => (
+        <a
+          href={`/blog/tag/${tag}/`}
+          class="rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:bg-primary-950"
+        >
+          {tag}
+        </a>
+      ))}
+    </div>
+
+    <h1 class="heading-primary mb-4">{title}</h1>
+
+    <p class="text-body mb-6 text-lg">
+      {description}
+    </p>
+
+    <div class="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+      <time datetime={publishedAt.toISOString()}>
+        {formattedDate}
+      </time>
+      <span class="text-slate-300 dark:text-slate-700">•</span>
+      <span>
+        {locale === 'en' ? `${Math.ceil(Content.length / 1000)} min read` : `${Math.ceil(Content.length / 1000)} 分钟阅读`}
+      </span>
+    </div>
+  </header>
+
+  <!-- Post Content -->
+  <div class="prose prose-slate mx-auto max-w-none dark:prose-invert lg:prose-lg">
+    <Content />
+  </div>
+
+  <!-- Related Posts -->
+  {relatedPosts.length > 0 && (
+    <section class="mt-16 border-t border-slate-200 pt-12 dark:border-slate-800">
+      <h2 class="heading-secondary mb-8">
+        {locale === 'en' ? 'Related Posts' : '相关文章'}
+      </h2>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {relatedPosts.map((relatedPost) => (
+          <a
+            href={`/blog/${relatedPost.slug}/`}
+            class="group card block transition-all hover:-translate-y-1"
+          >
+            <h3 class="heading-tertiary mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+              {relatedPost.data.title}
+            </h3>
+            <p class="text-body text-sm line-clamp-2">
+              {relatedPost.data.description}
+            </p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              {relatedPost.data.tags.slice(0, 2).map((tag) => (
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Navigation -->
+  <nav class="mt-12 flex justify-between border-t border-slate-200 pt-8 dark:border-slate-800">
+    <a
+      href="/blog"
+      class="btn-secondary"
+    >
+      ← {locale === 'en' ? 'Back to Blog' : '返回博客'}
+    </a>
+  </nav>
+</BlogLayout>
+
+<style>
+  .prose {
+    @apply text-slate-700 dark:text-slate-300;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+
+  .prose a {
+    @apply text-primary-600 no-underline hover:underline dark:text-primary-400;
+  }
+
+  .prose strong {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+
+  .prose code {
+    @apply rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900 dark:bg-dark-800 dark:text-slate-100;
+  }
+
+  .prose pre {
+    @apply mb-4 overflow-x-auto rounded-lg bg-slate-100 p-4 dark:bg-dark-800;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary-500 pl-4 italic dark:border-primary-400;
+  }
+
+  .prose img {
+    @apply rounded-lg shadow-lg;
+  }
+
+  .prose table {
+    @apply min-w-full divide-y divide-slate-200 dark:divide-slate-800;
+  }
+
+  .prose th {
+    @apply bg-slate-50 px-4 py-2 text-left text-sm font-semibold text-slate-900 dark:bg-dark-800 dark:text-slate-100;
+  }
+
+  .prose td {
+    @apply border-t border-slate-200 px-4 py-2 text-sm dark:border-slate-800;
+  }
+</style>

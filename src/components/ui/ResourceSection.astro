@@ -1,0 +1,157 @@
+---
+import type { Locale } from '@/i18n/ui';
+import ResourceCard from './ResourceCard.astro';
+
+interface Resource {
+  id: string;
+  title: { en: string; zh: string };
+  description: { en: string; zh: string };
+  type: 'pdf' | 'ppt' | 'excel' | 'word';
+  fileUrl: string;
+  fileSize: string;
+  date: string;
+}
+
+interface LevelLabels {
+  [key: string]: {
+    en: string;
+    zh: string;
+  };
+}
+
+interface Props {
+  title: string;
+  resources: Resource[];
+  levelLabels: LevelLabels;
+  locale: Locale;
+  resourceType: 'cima' | 'dma';
+}
+
+const { title, resources, levelLabels, locale, resourceType } = Astro.props;
+
+// Group resources by level
+const groupedResources = resources.reduce((acc, resource) => {
+  const level = resource.level;
+  if (!acc[level]) {
+    acc[level] = [];
+  }
+  acc[level].push(resource);
+  return acc;
+}, {} as Record<string, Resource[]>);
+
+// Get unique types from all resources
+const allTypes = Array.from(new Set(resources.map(r => r.type)));
+
+const typeLabels = {
+  pdf: locale === 'en' ? 'PDF' : 'PDF文档',
+  ppt: locale === 'en' ? 'Presentations' : '演示文稿',
+  excel: locale === 'en' ? 'Spreadsheets' : '电子表格',
+  word: locale === 'en' ? 'Documents' : '文档',
+  all: locale === 'en' ? 'All Types' : '全部类型',
+};
+
+const filterLabel = locale === 'en' ? 'Filter by type:' : '按类型筛选：';
+---
+
+<section class="my-8 rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-dark-900">
+  <h3 class="heading-tertiary mb-4">{title}</h3>
+
+  <!-- Type Filter Buttons -->
+  <div class="mb-6 flex flex-wrap gap-2">
+    <button
+      class="filter-btn active rounded-full px-4 py-2 text-sm font-medium transition-colors"
+      data-type="all"
+    >
+      {typeLabels.all}
+    </button>
+    {allTypes.map((type) => (
+      <button
+        class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-colors"
+        data-type={type}
+      >
+        {typeLabels[type]}
+      </button>
+    ))}
+  </div>
+
+  <!-- Resources by Level -->
+  <div class="space-y-6">
+    {Object.entries(groupedResources).map(([level, levelResources], groupIndex) => (
+      <div class="resource-group" data-level={level}>
+        <!-- Level Header -->
+        <h4 class="mb-3 text-lg font-semibold text-slate-800 dark:text-slate-200">
+          {levelLabels[level][locale]}
+        </h4>
+
+        <!-- Resource Grid by Type -->
+        <div class="space-y-4">
+          {['pdf', 'ppt', 'excel', 'word']
+            .filter(type => levelResources.some(r => r.type === type))
+            .map((type, typeIndex) => {
+              const typeResources = levelResources.filter(r => r.type === type);
+              return (
+                <div class="resource-type-group" data-type={type}>
+                  <div class="mb-2 flex items-center gap-2">
+                    <span class="text-lg">
+                      {type === 'pdf' ? '📄' : type === 'ppt' ? '📊' : type === 'excel' ? '📈' : '📝'}
+                    </span>
+                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      {typeLabels[type]} ({typeResources.length})
+                    </span>
+                  </div>
+                  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {typeResources.map((resource, resourceIndex) => (
+                      <ResourceCard
+                        resource={resource}
+                        locale={locale}
+                        index={resourceIndex}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .filter-btn {
+    @apply bg-white text-slate-600 hover:bg-slate-100 dark:bg-dark-800 dark:text-slate-400 dark:hover:bg-dark-700;
+  }
+
+  .filter-btn.active {
+    @apply bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600;
+  }
+
+  .resource-type-group.hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const resourceTypeGroups = document.querySelectorAll<HTMLElement>('.resource-type-group');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      // Update active state
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filterType = btn.dataset.type || 'all';
+
+      // Show/hide resource type groups
+      resourceTypeGroups.forEach((group) => {
+        const type = group.dataset.type || '';
+        if (filterType === 'all' || type === filterType) {
+          group.classList.remove('hidden');
+        } else {
+          group.classList.add('hidden');
+        }
+      });
+    });
+  });
+</script>

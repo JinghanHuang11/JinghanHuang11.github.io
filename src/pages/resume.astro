@@ -1,0 +1,158 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { profile } from '@/data/profile';
+import { ui, type Locale } from '@/i18n/ui';
+
+const urlLocale = Astro.url.searchParams.get('lang') as Locale | null;
+const locale: Locale = (urlLocale === 'en' || urlLocale === 'zh' ? urlLocale : 'en');
+const t = ui[locale];
+---
+
+<BaseLayout
+  title={t.resume.title}
+  locale={locale}
+>
+  <div class="container-custom section-padding">
+    <div class="mx-auto max-w-4xl">
+      <!-- Header -->
+      <div class="mb-12 flex flex-col items-center justify-between gap-6 sm:flex-row">
+        <div class="flex-1">
+          <h1 class="mb-2 text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">{profile.name[locale]}</h1>
+          <p class="text-base font-medium leading-snug text-slate-700 dark:text-slate-200 sm:text-lg">
+            {profile.tagline[locale]}
+          </p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <a
+            href="mailto:huangjh2022@163.com"
+            class="btn-secondary whitespace-nowrap px-5 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base"
+          >
+            {locale === 'en' ? 'Contact Me' : '联系我'}
+          </a>
+          <button
+            onclick="window.print()"
+            class="btn-secondary whitespace-nowrap px-5 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base"
+          >
+            <svg class="mr-1.5 h-3.5 w-3.5 sm:mr-2 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span class="text-sm sm:text-base">{t.resume.download}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <section class="mb-12 card">
+        <div class="grid gap-4 sm:grid-cols-3">
+          <a
+            href={`mailto:${profile.social.email}`}
+            class="flex items-center gap-3 text-slate-600 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400"
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span class="text-sm">{profile.social.email}</span>
+          </a>
+          <a
+            href={`https://github.com/${profile.social.github}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-3 text-slate-600 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400"
+          >
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span class="text-sm">{profile.social.github}</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Education -->
+      <section class="mb-12">
+        <h2 class="heading-secondary mb-6">{t.about.education}</h2>
+        <div class="space-y-6">
+          {profile.education.map((edu) => (
+            <div class="relative border-l-2 border-primary-200 pl-6 dark:border-primary-900">
+              <div class="absolute -left-2 top-0 h-4 w-4 rounded-full bg-primary-500 dark:bg-primary-400"></div>
+              <div class="card">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <div class="flex-1">
+                    <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                      {edu.degree[locale]}
+                    </h3>
+                    <p class="text-body mt-1">
+                      {edu.institution[locale]}
+                    </p>
+                  </div>
+                  <div class="mt-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-700 dark:bg-primary-950/50 dark:text-primary-300 sm:mt-0">
+                    {edu.period}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Qualifications -->
+      <section class="mb-12">
+        <h2 class="heading-secondary mb-6">{t.about.qualifications}</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          {profile.qualifications.map((qual) => (
+            <div class="card">
+              <div class="flex items-start gap-4">
+                <div class="flex-1">
+                  <h3 class="font-semibold text-slate-900 dark:text-slate-100">
+                    {qual.name[locale]}
+                  </h3>
+                  <p class="text-muted mt-1">{qual.issuer}</p>
+                </div>
+                <svg class="h-6 w-6 flex-shrink-0 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Skills -->
+      <section class="mb-12">
+        <h2 class="heading-secondary mb-6">{t.about.skills}</h2>
+        <div class="space-y-6">
+          {profile.skills.map((skillGroup) => (
+            <div class="card">
+              <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+                {skillGroup.category[locale]}
+              </h3>
+              <div class="flex flex-wrap gap-3">
+                {skillGroup.items.map((skill) => (
+                  <div class="rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-6 py-3 text-sm font-medium text-primary-700 dark:from-primary-950/50 dark:to-purple-950/50 dark:text-primary-300">
+                    {skill}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Research Interests -->
+      <section>
+        <h2 class="heading-secondary mb-6">{t.about.interests}</h2>
+        <div class="card">
+          <ul class="grid gap-4 sm:grid-cols-2">
+            {profile.interests[locale].map((interest) => (
+              <li class="flex items-center gap-3">
+                <svg class="h-5 w-5 flex-shrink-0 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span class="text-body">{interest}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

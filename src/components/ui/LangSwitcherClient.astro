@@ -1,0 +1,38 @@
+---
+import type { Locale } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  currentPath: string;
+}
+
+const { locale, currentPath } = Astro.props;
+const otherLocale: Locale = locale === 'en' ? 'zh' : 'en';
+
+// Build the path for the other locale
+const getOtherLocalePath = (path: string, targetLocale: Locale) => {
+  // Remove /zh/ prefix if exists
+  const cleanPath = path.replace(/^\/zh\//, '/').replace(/^\/zh$/, '/');
+  // Add /zh/ prefix if target is Chinese
+  return targetLocale === 'zh' ? `/zh${cleanPath === '/' ? '' : cleanPath}` : cleanPath;
+};
+
+const otherLocalePath = getOtherLocalePath(currentPath, otherLocale);
+---
+
+<a
+  href={otherLocalePath}
+  class="flex items-center space-x-1 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-800"
+  aria-label={`Switch to ${otherLocale === 'en' ? 'English' : '中文'}`}
+>
+  <span class="sr-only">{otherLocale === 'en' ? 'Switch to English' : '切换到中文'}</span>
+  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+    />
+  </svg>
+  <span>{locale === 'en' ? '中文' : 'EN'}</span>
+</a>

@@ -1,0 +1,47 @@
+---
+import type { Post } from '@/content/config';
+
+interface Props {
+  post: Post;
+  locale: 'en' | 'zh';
+}
+
+const { post, locale } = Astro.props;
+const { title, description, publishedAt, tags } = post.data;
+const formattedDate = new Date(publishedAt).toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<div class="card group">
+  <a href={`/blog/${post.slug}/`} class="block">
+    <div class="mb-4 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+      <time>{formattedDate}</time>
+      <span class="text-slate-300 dark:text-slate-700">•</span>
+      <span>{tags.length} tags</span>
+    </div>
+
+    <h3 class="heading-tertiary mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+      {title}
+    </h3>
+
+    <p class="text-body mb-4 line-clamp-2 text-sm">
+      {description}
+    </p>
+
+    <div class="flex flex-wrap gap-2">
+      {tags.slice(0, 3).map((tag) => (
+        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+          {tag}
+        </span>
+      ))}
+      {tags.length > 3 && (
+        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+          +{tags.length - 3}
+        </span>
+      )}
+    </div>
+  </a>
+</div>

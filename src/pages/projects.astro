@@ -1,0 +1,108 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { projects } from '@/data/projects';
+import ProjectCard from '@/components/ui/ProjectCard.astro';
+import { ui, type Locale } from '@/i18n/ui';
+
+const urlLocale = Astro.url.searchParams.get('lang') as Locale | null;
+const locale: Locale = (urlLocale === 'en' || urlLocale === 'zh' ? urlLocale : 'en');
+const t = ui[locale];
+
+// Get all unique tags
+const allTags = Array.from(
+  new Set(projects.flatMap((p) => p.tags))
+).sort();
+---
+
+<BaseLayout
+  title={t.projects.title}
+  locale={locale}
+>
+  <div class="container-custom section-padding">
+    <div class="mx-auto max-w-6xl">
+      <!-- Header -->
+      <div class="mb-12 text-center">
+        <h1 class="heading-primary mb-4">{t.projects.title}</h1>
+        <p class="text-body mx-auto max-w-2xl">
+          {locale === 'en'
+            ? 'A collection of my projects in business analytics, financial analysis, and research.'
+            : '我在商务分析、财务分析和研究方面的项目集合。'}
+        </p>
+      </div>
+
+      <!-- Filter Tags -->
+      <div class="mb-8">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
+            {t.projects.filter}:
+          </span>
+          <button
+            class="filter-btn active rounded-full px-4 py-2 text-sm font-medium transition-colors"
+            data-filter="all"
+          >
+            {t.projects.all}
+          </button>
+          {allTags.map((tag) => (
+            <button
+              class="filter-btn rounded-full px-4 py-2 text-sm font-medium transition-colors"
+              data-filter={tag}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Projects Grid -->
+      <div id="projects-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {projects.map((project) => (
+          <div
+            class="project-card"
+            data-tags={project.tags.join(',')}
+          >
+            <ProjectCard project={project} locale={locale} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .filter-btn {
+    @apply bg-white text-slate-600 hover:bg-slate-100 dark:bg-dark-800 dark:text-slate-400 dark:hover:bg-dark-700;
+  }
+
+  .filter-btn.active {
+    @apply bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600;
+  }
+
+  .project-card.hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  const filterBtns = document.querySelectorAll<HTMLElement>('.filter-btn');
+  const projectCards = document.querySelectorAll<HTMLElement>('.project-card');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      // Update active button
+      filterBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Filter projects
+      projectCards.forEach((card) => {
+        const tags = card.dataset.tags || '';
+        if (filter === 'all' || tags.includes(filter)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+</script>
